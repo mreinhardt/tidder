@@ -16,10 +16,15 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
+from lib.settings import Settings
 
-def main():
+
+def main(settings):
     print "tidder!"
+    print settings.args
 
 
 if __name__ == "__main__":
-    main()
+    settings = Settings()
+    settings.parse_args()
+    main(settings)
