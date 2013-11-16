@@ -16,10 +16,12 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
+from lib.screen import Screen
 from lib.settings import Settings
 
 
 def main(settings):
+    screen = Screen()
     print "tidder!"
     print settings.args
 
