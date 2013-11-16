@@ -1,0 +1,14 @@
+#!/usr/bin/env sh
+
+# direct bin file usage
+BINPATH=`dirname $0`
+BINFILE="$BINPATH/../tidder/main.py"
+if [[ -f $BINFILE ]]
+then
+    python "$BINPATH/../tidder/main.py" $@
+else
+    # symlinked bin file usage
+    SYMPATH=`dirname $(readlink $0)`
+    SYMFILE="$SYMPATH/../tidder/main.py"
+    python "$SYMPATH/../tidder/main.py" $@
+fi
