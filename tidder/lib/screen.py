@@ -1,4 +1,5 @@
 import curses
+from curses.ascii import unctrl
 
 from tidder.lib.log import Log
 
@@ -60,16 +61,19 @@ class Screen(object):
 
         while True:
             c = self.stdscr.getch()
+            ck = filter(lambda t: t[1] == c, curses.__dict__.items())
+            c = ck[0][0] if len(ck) else unctrl(c)
             logger.debug(c)
 
-            if c in [curses.KEY_RESIZE, curses.ERR]:
+            if c in ['KEY_RESIZE', 'ERR']:
                 self.height, self.width = self.stdscr.getmaxyx()
+                self.status_bar.width = self.width
                 self.status_bar.window.mvwin(self.height - 2, 0)
                 self.stdscr.clear()
                 self.stdscr.refresh()
                 self.status_bar.window.refresh()
 
-            if c == ord('q'):
+            if c == 'q':
                 log.clear_screen()
                 break
 
