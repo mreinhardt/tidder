@@ -24,6 +24,7 @@ from lib.log import Log
 def main(settings):
     log = Log(level=settings['log'] or 'WARNING')
     logger = log.logger
+    logger.info("Starting tidder...")
 
     from lib.screen import Screen
     from reddit.auth import login
@@ -35,7 +36,6 @@ def main(settings):
     except InvalidUserPass as e:
         log.logger.error('Incorrect password')
 
-    logger.info("tidder!")
-    logger.debug(settings)
+    logger.debug('settings: {0}'.format(settings))
     screen = Screen()
     logger.info("Goodbye tidder, hello life...")

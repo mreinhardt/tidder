@@ -15,7 +15,7 @@ class ScreenHandler(logging.StreamHandler):
     def emit(self, record):
         try:
             msg = self.format(record)
-            self.screen.status_bar.setstr(msg)
+            self.screen.bars['message'].setstr(msg)
             self.flush()
         except (KeyboardInterrupt, SystemExit):
             raise

@@ -29,7 +29,9 @@ class Color(object):
 
 class ColorPair(object):
     SCREEN = 1
+    BAR = 2
     STATUSBAR = 3
+    MESSAGEBAR = 4
 
 
 class Screen(object):
@@ -55,7 +57,10 @@ class Screen(object):
 
         self.height, self.width = self.stdscr.getmaxyx()
 
-        self.status_bar = StatusBar(1, self.width, self.height - 2, 0)
+        self.bars = {
+            'status': StatusBar(self),
+            'message': MessageBar(self)
+        }
 
         while True:
             c = self.stdscr.getch()
@@ -65,27 +70,25 @@ class Screen(object):
 
             if c in ['KEY_RESIZE', 'ERR']:
                 self.height, self.width = self.stdscr.getmaxyx()
-                self.status_bar.width = self.width
-                self.status_bar.window.mvwin(self.height - 2, 0)
                 self.stdscr.clear()
                 self.stdscr.refresh()
-                self.status_bar.window.refresh()
+                for bar in self.bars.values():
+                    bar.setpos()
 
             if c == 'q':
                 log.clear_screen()
                 break
 
 
-class StatusBar(object):
-    bgcolor = Color.BRGREEN
+class Bar(object):
+    bgcolor = Color.WHITE
     fgcolor = Color.BLACK
 
-    def __init__(self, height, width, y, x, bgcolor=None, fgcolor=None):
-        self.y = y
-        self.x = x
-        self.height = height
-        self.width = width
-        self.window = curses.newwin(height, width, y, x)
+    def __init__(self, screen, bgcolor=None, fgcolor=None):
+        self.screen = screen
+        self.height = 1
+        self.width = screen.width
+        self.window = curses.newwin(self.height, self.width, 0, 0)
         if bgcolor is not None and fgcolor is not None:
             self.bgcolor = bgcolor
             self.fgcolor = fgcolor
@@ -94,9 +97,49 @@ class StatusBar(object):
         curses.init_pair(color_pair, self.fgcolor, self.bgcolor)
 
         self.window.bkgd(curses.color_pair(color_pair))
+        self.setpos()
+
+    def _repos(self):
+        self.window.mvwin(self.y, self.x)
+        self.window.refresh()
+
+    def setpos(self):
+        self.y = 0
+        self.x = 0
+        self.width = self.screen.width
+        self._repos()
+
+    def setstr(self, s):
+        try:
+            self.window.addstr(0, 0, "{0:<{1}}".format(s, self.width - 1))
+            self.window.refresh()
+        except:
+            pass  # resizing terminal window, width incorrect
+
+
+class StatusBar(Bar):
+    bgcolor = Color.BRGREEN
+    fgcolor = Color.BLACK
+
+    def setpos(self):
+        self.y = self.screen.height - 2
+        self.x = 0
+        self.width = self.screen.width
+        self._repos()
+
+
+class MessageBar(Bar):
+    bgcolor = Color.BLACK
+    fgcolor = Color.BRGREEN
+
+    def __init__(self, screen, bgcolor=None, fgcolor=None):
+        super(MessageBar, self).__init__(screen, bgcolor, fgcolor)
+
         self.window.addstr(0, 0, "Welcome to tidder!")
         self.window.refresh()
 
-    def setstr(self, s):
-        self.window.addstr(0, 0, "{0:<{1}}".format(s, self.width - 1))
-        self.window.refresh()
+    def setpos(self):
+        self.y = self.screen.height - 1
+        self.x = 0
+        self.width = self.screen.width
+        self._repos()
