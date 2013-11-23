@@ -20,13 +20,13 @@ class Settings(object):
             return {}
 
     def _read_config_file(self, raw_config):
-        config_pattern = re.compile(r'(\w+)=(.*)')
+        config_pattern = re.compile(r'(\w+)\s*=(.*?)(?:$|#)')
         config = {}
         for line in raw_config:
-            m = config_pattern.match(line)
+            m = config_pattern.search(line)
             if m is not None:
                 k, v = m.groups()
-                config[k] = v
+                config[k] = v.strip()
         return config
 
     def _init_parser(self):

@@ -35,6 +35,7 @@ def main(settings):
     except InvalidUserPass as e:
         log.logger.error('Incorrect password')
 
-    screen = Screen()
     logger.info("tidder!")
     logger.debug(settings)
+    screen = Screen()
+    logger.info("Goodbye tidder, hello life...")

@@ -39,8 +39,6 @@ class Screen(object):
             curses.wrapper(self._main)
         except KeyboardInterrupt:
             log.clear_screen()
-            logger.info("Goodbye tidder, hello life...")
-            exit()
 
     def _main(self, stdscr):
         global log
