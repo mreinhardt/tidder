@@ -2,13 +2,13 @@
 
 # direct bin file usage
 BINPATH=`dirname $0`
-BINFILE="$BINPATH/../tidder/main.py"
+BINFILE="$BINPATH/../run.py"
 if [[ -f $BINFILE ]]
 then
-    python "$BINPATH/../tidder/main.py" $@
+    python "$BINFILE" $@
 else
     # symlinked bin file usage
     SYMPATH=`dirname $(readlink $0)`
-    SYMFILE="$SYMPATH/../tidder/main.py"
-    python "$SYMPATH/../tidder/main.py" $@
+    SYMFILE="$SYMPATH/../run.py"
+    python "$SYMFILE" $@
 fi

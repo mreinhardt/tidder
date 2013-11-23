@@ -16,16 +16,17 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
+from praw.errors import InvalidUserPass
+
 from lib.screen import Screen
-from lib.settings import Settings
+from reddit.auth import login
 
 
 def main(settings):
+    try:
+        login(settings['username'], settings['password'])
+    except InvalidUserPass as e:
+        print 'Incorrect password'
     screen = Screen()
     print "tidder!"
-    print settings.settings
-
-
-if __name__ == "__main__":
-    settings = Settings()
-    main(settings)
+    print settings
