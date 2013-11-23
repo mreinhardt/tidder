@@ -23,10 +23,9 @@ from lib.settings import Settings
 def main(settings):
     screen = Screen()
     print "tidder!"
-    print settings.args
+    print settings.settings
 
 
 if __name__ == "__main__":
     settings = Settings()
-    settings.parse_args()
     main(settings)
