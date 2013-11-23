@@ -22,13 +22,16 @@ from lib.log import Log
 
 
 def main(settings):
-    logger = Log(level=settings['log'] or 'WARNING').logger
+    log = Log(level=settings['log'] or 'WARNING')
+    logger = log.logger
 
     from lib.screen import Screen
     from reddit.auth import login
 
     try:
-        login(settings['username'], settings['password'])
+        if (settings['username'] is not None and
+            settings['password'] is not None):
+            login(settings['username'], settings['password'])
     except InvalidUserPass as e:
         log.logger.error('Incorrect password')
 

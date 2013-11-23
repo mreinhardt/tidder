@@ -3,46 +3,98 @@ import curses
 from tidder.lib.log import Log
 
 
-logger = Log().logger
+log = Log()
+logger = log.logger
+
+
+class Color(object):
+    BLACK = curses.COLOR_BLACK
+    BLUE = curses.COLOR_BLUE
+    CYAN = curses.COLOR_CYAN
+    GREEN = curses.COLOR_GREEN
+    MAGENTA = curses.COLOR_MAGENTA
+    RED = curses.COLOR_RED
+    WHITE = curses.COLOR_WHITE
+    YELLOW = curses.COLOR_YELLOW
+    BRBLACK = 8
+    BRRED = 9
+    BRGREEN = 10
+    BRYELLOW = 11
+    BRBLUE = 12
+    BRMAGENTA = 13
+    BRCYAN = 14
+    BRWHITE = 15
+
+
+class ColorPair(object):
+    SCREEN = 1
+    STATUSBAR = 3
 
 
 class Screen(object):
-     def __init__(self):
-          try:
-               curses.wrapper(self._main)
-          except KeyboardInterrupt:
-               logger.info("Goodbye tidder, hello life...")
-               exit()
+    def __init__(self):
+        global log
+        try:
+            curses.wrapper(self._main)
+        except KeyboardInterrupt:
+            log.clear_screen()
+            logger.info("Goodbye tidder, hello life...")
+            exit()
 
-     def _main(self, stdscr):
-          self.stdscr = stdscr
+    def _main(self, stdscr):
+        global log
+        log.set_screen(self)
 
-          # curses experimentation
-          curses.start_color()
-          curses.init_pair(1, curses.COLOR_BLUE, curses.COLOR_BLACK)
-          curses.init_pair(2, curses.COLOR_GREEN, curses.COLOR_BLACK)
+        self.stdscr = stdscr
 
-          self.stdscr.bkgd(curses.color_pair(1))
-          self.stdscr.refresh()
+        curses.start_color()
+        color_pair = getattr(ColorPair, self.__class__.__name__.upper())
+        curses.init_pair(color_pair, curses.COLOR_BLUE, curses.COLOR_BLACK)
 
-          self.height, self.width = self.stdscr.getmaxyx()
+        self.stdscr.bkgd(curses.color_pair(color_pair))
+        self.stdscr.refresh()
 
-          win = curses.newwin(6, 20, self.height / 2 - 3, self.width / 2 - 10)
-          win.bkgd(curses.color_pair(2))
-          win.box()
-          win.attron(curses.A_BOLD)
-          win.addstr(2, 2, "tidder!")
-          win.refresh()
+        self.height, self.width = self.stdscr.getmaxyx()
 
-          while True:
-               c = self.stdscr.getch()
-               win.addstr(3, 2, "{0:<15}".format(c))
-               win.refresh()
-               if c in [curses.KEY_RESIZE, curses.ERR]:
-                    self.height, self.width = self.stdscr.getmaxyx()
-                    win.mvwin(self.height / 2 - 3, self.width / 2 - 10)
-                    self.stdscr.clear()
-                    self.stdscr.refresh()
-                    win.refresh()
-               if c == ord('q'):
-                    break
+        self.status_bar = StatusBar(1, self.width, self.height - 2, 0)
+
+        while True:
+            c = self.stdscr.getch()
+            logger.debug(c)
+
+            if c in [curses.KEY_RESIZE, curses.ERR]:
+                self.height, self.width = self.stdscr.getmaxyx()
+                self.status_bar.window.mvwin(self.height - 2, 0)
+                self.stdscr.clear()
+                self.stdscr.refresh()
+                self.status_bar.window.refresh()
+
+            if c == ord('q'):
+                log.clear_screen()
+                break
+
+
+class StatusBar(object):
+    bgcolor = Color.BRGREEN
+    fgcolor = Color.BLACK
+
+    def __init__(self, height, width, y, x, bgcolor=None, fgcolor=None):
+        self.y = y
+        self.x = x
+        self.height = height
+        self.width = width
+        self.window = curses.newwin(height, width, y, x)
+        if bgcolor is not None and fgcolor is not None:
+            self.bgcolor = bgcolor
+            self.fgcolor = fgcolor
+
+        color_pair = getattr(ColorPair, self.__class__.__name__.upper())
+        curses.init_pair(color_pair, self.fgcolor, self.bgcolor)
+
+        self.window.bkgd(curses.color_pair(color_pair))
+        self.window.addstr(0, 0, "Welcome to tidder!")
+        self.window.refresh()
+
+    def setstr(self, s):
+        self.window.addstr(0, 0, "{0:<{1}}".format(s, self.width - 1))
+        self.window.refresh()
