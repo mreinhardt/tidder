@@ -18,15 +18,20 @@
 
 from praw.errors import InvalidUserPass
 
-from lib.screen import Screen
-from reddit.auth import login
+from lib.log import Log
 
 
 def main(settings):
+    logger = Log(level=settings['log'] or 'WARNING').logger
+
+    from lib.screen import Screen
+    from reddit.auth import login
+
     try:
         login(settings['username'], settings['password'])
     except InvalidUserPass as e:
-        print 'Incorrect password'
+        log.logger.error('Incorrect password')
+
     screen = Screen()
-    print "tidder!"
-    print settings
+    logger.info("tidder!")
+    logger.debug(settings)

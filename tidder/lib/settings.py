@@ -33,6 +33,7 @@ class Settings(object):
         argparser = argparse.ArgumentParser(
             description='"I dunno, just put the word \'description\'."',
             usage='bin/tidder')
+        argparser.add_argument('-l', '--log', help='log level')
         argparser.add_argument('-u', '--username', help='username')
         argparser.add_argument('-p', '--password', help='password')
         return argparser

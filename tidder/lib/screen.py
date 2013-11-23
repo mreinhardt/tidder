@@ -1,12 +1,17 @@
 import curses
 
+from tidder.lib.log import Log
+
+
+logger = Log().logger
+
 
 class Screen(object):
      def __init__(self):
           try:
                curses.wrapper(self._main)
           except KeyboardInterrupt:
-               print "Goodbye tidder, hello life..."
+               logger.info("Goodbye tidder, hello life...")
                exit()
 
      def _main(self, stdscr):
