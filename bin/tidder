@@ -1,5 +1,8 @@
 #!/usr/bin/env sh
 
+# reduce delay when hitting ESC key
+export ESCDELAY=25
+
 # direct bin file usage
 BINPATH=`dirname $0`
 BINFILE="$BINPATH/../run.py"
